@@ -1,14 +1,18 @@
+import os  # Import os module to check for file existence
+
 account = {}
 users = {}
 account_file = "account.txt"
 login_file = "login.txt"
+      
+    
 
 #---------------Load Account Details---------------
 def load_account():
+    
     try :
-        with open(account_file,"r") as file :
-        
-            for line in file :
+        with open("load_account.txt","r") as load_account_file :
+            for line in load_account_file :
                 parts = line.strip().split(",")
                 if len(parts) >= 3 :
                     acc_no = parts[0]
@@ -20,35 +24,39 @@ def load_account():
                                     "balance" : balance,
                                     "transaction" : transaction
                     }
-                    file.write(account[acc_no])
+                    #load_account_file.write(account[acc_no])
     except FileNotFoundError:
         pass #file does not exist yet
 
 #---------------Save Account Detail---------------
 def save_account():
-    with open(account_file,"w") as file:
+    with open("save_account.txt","a") as save_account_file:
         for acc_no,data in account.items():
-            line = f"{acc_no}|{data['name']}|{data['balance']}|{'|'.join(data["transation"])}\n"
-            file.write(line)
+            line = f"{acc_no:^10}{data['name']:^15}{' | '.join(data["transaction"]):^20}\n"
+            save_account_file.write(line)
 
 #---------------Load Login Details---------------
 def load_login():
+    
+       
     try:
-        with open(login_file,"r") as file:
-            print(file.read())
-            for line in file:
-                username,password,role,acc_no = line.strip().split(",")
-                users[username] = {"password":password,"role":role,"acc_no":acc_no}
+        with open("load_login.txt","r") as load_login_file:
+            #print(load_login_file.read())
+            for line in load_login_file:
+                username,password,role,acc_no = line.strip()
+                users[username] = {"username" :username,"password":password,"role":role,"acc_no":acc_no}
+                #print(load_login_file.read())
     except FileNotFoundError:
         pass
-
+        
 
 #---------------Save Login Details---------------
 def save_login():
-    with open(login_file,"w") as file:
-        for username,data in users.items():
-            line = (f"{username}|{data['password']}|{data['role']}|{data['acc_no']}\n")
-            file.write(line)
+    #if not os.path.exists(login_file):
+        with open("save_login.txt","a") as save_login_file:
+            for username,data in users.items():
+                line = (f"{username:^15}{data['password']:^15}{data['role']:^10}{data['acc_no']:^10}\n")
+                save_login_file.write(line)
 
 #---------------Register New Customer---------------
 def register_customer():
@@ -152,10 +160,13 @@ def login():
                 print("Too many Invalid attempts. Please try again Later.")
                 break
 
+
+
 #---------------Menu---------------
 def main():
     load_account()
     load_login()
+    
 
     while True :
         print("\n ---Welcome to Bank System---")
@@ -174,6 +185,9 @@ def main():
             break
         else :
             print("Invalid Option please try again")
+
+    login()
         
 #---------------Run the program---------------
+
 main()
