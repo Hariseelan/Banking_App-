@@ -1,69 +1,75 @@
-import os  # Import os module to check for file existence
+import os       #---------------------------------Import os module to check for file existence-----------------------------------------
 
+# Initialize dictionaries to store account and user details
 account = {}
 users = {}
+
+# Define file paths for account and login data
 account_file = "account.txt"
 login_file = "login.txt"
       
     
 
 #---------------Load Account Details---------------
-def load_account():
-    
+
+def load_account():   
     try :
-        with open("load_account.txt","r") as load_account_file :
-            for line in load_account_file :
+        with open("load_account.txt","r") as file :                         # Open the account file for reading
+            for line in file :
                 parts = line.strip().split(",")
-                if len(parts) >= 3 :
-                    acc_no = parts[0]
-                    name = parts[1]
-                    balance = float(parts[2])
-                    transaction = parts[3:] if len(parts) > 3 else []
+                if len(parts) >= 3 :        
+                    acc_no = parts[0]                                       # Account number
+                    name = parts[1]                                         # Account holder name
+                    balance = float(parts[2])                               # Account balance
+                    transaction = parts[3:] if len(parts) > 3 else []       # Transaction history
                     account[acc_no]={
                                     "name" : name,
                                     "balance" : balance,
                                     "transaction" : transaction
                     }
-                    #load_account_file.write(account[acc_no])
+                    
     except FileNotFoundError:
-        pass #file does not exist yet
+        pass #______________________________________________________________ file does not exist yet
 
 #---------------Save Account Detail---------------
+
 def save_account():
     with open("save_account.txt","a") as save_account_file:
         for acc_no,data in account.items():
-            line = f"{acc_no:^10}{data['name']:^15}{' | '.join(data["transaction"]):^20}\n"
+            line = f"{acc_no:^10}{data['name']:^15}{' | '.join(data["transaction"]):^20}\n"                         # Write each user's details in a formatted line
             save_account_file.write(line)
 
 #---------------Load Login Details---------------
+
 def load_login():
     
        
     try:
         with open("load_login.txt","r") as load_login_file:
-            #print(load_login_file.read())
             for line in load_login_file:
                 username,password,role,acc_no = line.strip()
-                users[username] = {"username" :username,"password":password,"role":role,"acc_no":acc_no}
+                users[username] = {"username" :username,"password":password,"role":role,"acc_no":acc_no}            # Store user login details in the users dictionary
                 #print(load_login_file.read())
     except FileNotFoundError:
         pass
         
 
 #---------------Save Login Details---------------
+
 def save_login():
-    #if not os.path.exists(login_file):
+    if not os.path.exists(login_file):
         with open("save_login.txt","a") as save_login_file:
             for username,data in users.items():
-                line = (f"{username:^15}{data['password']:^15}{data['role']:^10}{data['acc_no']:^10}\n")
+                line = (f"{username:^15}{data['password']:^15}{data['role']:^10}{data['acc_no']:^10}\n")               # Write each user's details in a formatted line
                 save_login_file.write(line)
 
 #---------------Register New Customer---------------
+
 def register_customer():
     username = input('Enter the Username : ')
     if username in users:
         print("Username already exists.")
-        return
+        return                                          # Exit the function if username already exists
 
     password = input('Enter Your Password : ')
     name = input('Enter Your name : ')
@@ -79,22 +85,26 @@ def register_customer():
         except ValueError:
             print("Invalid input please enter the valid numeric")  
 
-    acc_no = str(len(account)+1001)
+    acc_no = str(len(account)+1001)                                                                                     # Generate a unique account number
 
+    # Store the new customer in the `users` and `account` dictionaries
     users[username] = {"password" : password,"role" : "customer","acc_no" : acc_no}
     account[acc_no] = {"name" : name,"balance":balance,"transaction":[f"Initial deposit:{balance}"]}
     print(f"Account created! Your account number is {acc_no}")
 
 #---------------Admin Menu---------------
-def admin_menu():
+
+def admin_menu(account):
     while True:
         print("\n=== Admin Menu ===")
         print("1.View All Account Detail")
         print("2.Exit")
         choice = input("choose: ")
         if choice == "1" :
-            for acc_no,data in account.items():
-                print(f"{acc_no}-{data['name']}-balance:{data['balance']}")
+            if account :
+                print("\n ---Account Details---")
+                for acc_no,data in account.items():
+                    print(f"{acc_no}-{data['name']}-balance:{data['balance']}")
         elif choice == "2" :
             break
         else:
@@ -102,6 +112,7 @@ def admin_menu():
 
 
 #---------------Customer menu---------------
+
 def customer_menu(acc_no):
     while True:
         print("\n ---Customer Menu--- ")
@@ -113,8 +124,8 @@ def customer_menu(acc_no):
         choice = input("choose : ")
         if choice == '1':
             amount = float(input("Enter amount to deposit : "))
-            if amount > 0:
-                account[acc_no]["balance"]+=amount
+            if amount > 0:                                                          # Ensure the deposit amount is positive                    
+                account[acc_no]["balance"]+=amount                                  # Update balance
                 account[acc_no]["transaction"].append(f"Deposited : {amount}")
                 print ("Deposit Successful.")
         elif choice == '2' :
@@ -126,31 +137,40 @@ def customer_menu(acc_no):
             else:
                 print("Insufficient balance...Please try again...")
         elif choice == '3' :
-            print("balance : ",account[acc_no]["balance"])
+            print("balance : ",account[acc_no]["balance"])                          # Display current balance
         elif choice == '4' :
             print("Transaction : ")
             for t in account[acc_no]["transaction"]:
-                print("-",t)
+                print("-",t)                                                        # Display all transactions
         elif choice == '5' :
-            break
+            break                                                                   # Exit the customer menu
         else :
             print("Invalid Choose---please enter the valid choose===")
         
 #---------------Login--------------- 
-def login():
-    attempts = 3        # Allow 3 attemptd to Login
+
+def login(users):
+    attempts = 3                                                                     # Allow 3 attemptd to Login
     while attempts > 0 :
         username = input("Enter your username : ")
         password = input("Enter your password : ")
         
+                
         if username in users and users[username]['password']==password:
             role = users[username]['role']
             acc_no = users[username]['acc_no']
 
-            if role == "admin" : 
-                admin_menu()
+            print("""\n 
+            ************************
+            *                      *
+            * Login successful !!! *
+            *                      *
+            ************************\n""")
+
+            if role == "admin" :        
+                admin_menu()                                                            # Call admin menu with account data
             else:
-                customer_menu(acc_no)
+                customer_menu(acc_no)                                                   # Call customer menu with account number
             break
         else:
             attempts -= 1
@@ -158,31 +178,38 @@ def login():
                 print(f"Invalid Login --- please try again --- you have {attempts} attempts left.")
             else:
                 print("Too many Invalid attempts. Please try again Later.")
-                break
+            break
 
 
 
 #---------------Menu---------------
+
 def main():
-    load_account()
-    load_login()
     
+    load_account()              # Load account data at the start
+    load_login()                # Load login data at the start
 
     while True :
         print("\n ---Welcome to Bank System---")
-        print("1) Login")
-        print("2) Register as Customer")
-        print("3) Exit")
+        print("1) Admin")
+        print("2) Login")
+        print("3) Register as Customer")
+        print("4) Exit")
         choice = input("Choose : ")
         if choice == '1' :
-            login()     # Call login after loading the login data
+            admin_menu(account)    
         elif choice == '2' :
-            register_customer()
+            login(users)            # Call login after loading the login data
+            load_account()
+            load_login()
         elif choice == '3' :
-            save_account()
-            save_login()
+            register_customer()     # Register a new customer
+            save_account()          # Save account data after registration
+            save_login()            # Save login data after registration
+        elif choice == '4' :
+            
             print("Good bye guys have a nice day thankyou and come again")
-            break
+            break                   # Exit the program
         else :
             print("Invalid Option please try again")
 
@@ -190,4 +217,4 @@ def main():
         
 #---------------Run the program---------------
 
-main()
+main()      # ----------Start the program----------
