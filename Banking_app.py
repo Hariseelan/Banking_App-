@@ -17,19 +17,23 @@ def load_account():
         with open("load_account.txt","r") as file :                         # Open the account file for reading
             for line in file :
                 parts = line.strip().split(",")
-                if len(parts) >= 3 :        
-                    acc_no = parts[0]                                       # Account number
-                    name = parts[1]                                         # Account holder name
-                    balance = float(parts[2])                               # Account balance
-                    transaction = parts[3:] if len(parts) > 3 else []       # Transaction history
-                    account[acc_no]={
-                                    "name" : name,
-                                    "balance" : balance,
-                                    "transaction" : transaction
-                    }
+                        
+                acc_no = parts[0]                                       # Account number
+                name = parts[1]                                         # Account holder name
+                balance = float(parts[2])                               # Account balance
+                transaction = parts[3:] if len(parts) > 3 else []       # Transaction history
+                account[acc_no]={
+                                "name" : name,
+                                "balance" : balance,
+                                "transaction" : transaction
+                }
                     
     except FileNotFoundError:
         pass #______________________________________________________________ file does not exist yet
+    
+    return account
+
+
 
 #---------------Save Account Detail---------------
 
@@ -38,6 +42,8 @@ def save_account():
         for acc_no,data in account.items():
             line = f"{acc_no:^10}{data['name']:^15}{' | '.join(data["transaction"]):^20}\n"                         # Write each user's details in a formatted line
             save_account_file.write(line)
+
+
 
 #---------------Load Login Details---------------
 
@@ -54,6 +60,7 @@ def load_login():
         pass
         
 
+
 #---------------Save Login Details---------------
 
 def save_login():
@@ -63,16 +70,18 @@ def save_login():
                 line = (f"{username:^15}{data['password']:^15}{data['role']:^10}{data['acc_no']:^10}\n")               # Write each user's details in a formatted line
                 save_login_file.write(line)
 
+
+
 #---------------Register New Customer---------------
 
 def register_customer():
-    username = input('Enter the Username : ')
+    username = input('Enter the Username : ').strip()
     if username in users:
         print("Username already exists.")
         return                                          # Exit the function if username already exists
 
-    password = input('Enter Your Password : ')
-    name = input('Enter Your name : ')
+    password = input('Enter Your Password : ').strip()
+    name = input('Enter Your name : ').strip()
 
     while True:
         balance_input = (input('Enter initial balance : '))
@@ -83,7 +92,7 @@ def register_customer():
             else:
                 print("Please Enter the valid amount")
         except ValueError:
-            print("Invalid input please enter the valid numeric")  
+            print("\n !!! Invalid input please enter the valid numeric !!!")  
 
     acc_no = str(len(account)+1001)                                                                                     # Generate a unique account number
 
@@ -92,6 +101,8 @@ def register_customer():
     account[acc_no] = {"name" : name,"balance":balance,"transaction":[f"Initial deposit:{balance}"]}
     print(f"Account created! Your account number is {acc_no}")
 
+
+
 #---------------Admin Menu---------------
 
 def admin_menu(account):
@@ -99,7 +110,7 @@ def admin_menu(account):
         print("\n=== Admin Menu ===")
         print("1.View All Account Detail")
         print("2.Exit")
-        choice = input("choose: ")
+        choice = input("\n Enter choose : ")
         if choice == "1" :
             if account :
                 print("\n ---Account Details---")
@@ -108,34 +119,38 @@ def admin_menu(account):
         elif choice == "2" :
             break
         else:
-            print("Invalid choice.Please try again......")
+            print("\n     !!!     Invalid choice.Please try again......     !!!     ")
+
 
 
 #---------------Customer menu---------------
 
 def customer_menu(acc_no):
     while True:
-        print("\n ---Customer Menu--- ")
+        print("""\n        
+            ===================
+            ---Customer Menu--- 
+            ===================""")
         print("1 >>> Deposit")
         print("2 >>> withdraw")
         print("3 >>> check balance")
         print("4 >>> Transaction History")
         print("5 >>> Exit")
-        choice = input("choose : ")
+        choice = input("\n Enter choose : ")
         if choice == '1':
             amount = float(input("Enter amount to deposit : "))
             if amount > 0:                                                          # Ensure the deposit amount is positive                    
                 account[acc_no]["balance"]+=amount                                  # Update balance
                 account[acc_no]["transaction"].append(f"Deposited : {amount}")
-                print ("Deposit Successful.")
+                print ("\n >>>>>>>>>> Deposit Successful. <<<<<<<<<<")
         elif choice == '2' :
             amount = float(input("Enter amount to withdraw : "))
             if 0 < amount <= account[acc_no]["balance"] :
                 account[acc_no]["balance"]-= amount
                 account[acc_no]["transaction"].append(f"withdraw : {amount}")
-                print("withdraw Successful.")
+                print("\n >>>>>>>>>> withdraw Successful. <<<<<<<<<<")
             else:
-                print("Insufficient balance...Please try again...")
+                print("\n  !!!!!Insufficient balance...Please try again... !!!!!")
         elif choice == '3' :
             print("balance : ",account[acc_no]["balance"])                          # Display current balance
         elif choice == '4' :
@@ -145,27 +160,36 @@ def customer_menu(acc_no):
         elif choice == '5' :
             break                                                                   # Exit the customer menu
         else :
-            print("Invalid Choose---please enter the valid choose===")
-        
+            print("Invalid Choose---please enter the valid choose---")
+
+
+
 #---------------Login--------------- 
 
 def login(users):
     attempts = 3                                                                     # Allow 3 attemptd to Login
     while attempts > 0 :
-        username = input("Enter your username : ")
-        password = input("Enter your password : ")
+        username = input("Enter your username : ").strip()
+        password = input("Enter your password : ").strip()
+        acc_no_input = int(input("Enter your Account Number : ").strip())
         
                 
-        if username in users and users[username]['password']==password:
+        if  (username in users and users[username]['password']==password and users[username]['acc_no']==acc_no_input) :
+            
             role = users[username]['role']
             acc_no = users[username]['acc_no']
 
-            print("""\n 
-            ************************
-            *                      *
-            * Login successful !!! *
-            *                      *
-            ************************\n""")
+            '''print("""\n 
+            *****************************
+            *                           *
+            *   Login successful !!!    *
+            *                           *
+            *****************************
+                                       
+              "welcome,have a nice day" 
+                                       
+            *****************************
+            \n""")'''
 
             if role == "admin" :        
                 admin_menu()                                                            # Call admin menu with account data
@@ -173,11 +197,17 @@ def login(users):
                 customer_menu(acc_no)                                                   # Call customer menu with account number
             break
         else:
-            attempts -= 1
+            attempts = attempts-1
             if attempts > 0 :
                 print(f"Invalid Login --- please try again --- you have {attempts} attempts left.")
-            else:
-                print("Too many Invalid attempts. Please try again Later.")
+            '''else:
+                print("""\n
+                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                Too many Invalid attempts. Please try again Later.
+
+                !!!!!!!!!!!1!!!!!!1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                \n""")'''
             break
 
 
@@ -190,12 +220,19 @@ def main():
     load_login()                # Load login data at the start
 
     while True :
-        print("\n ---Welcome to Bank System---")
+        print("""\n 
+        ----------------------------
+        ----------------------------
+        ---Welcome to Bank System---  
+        ----------------------------
+        ----------------------------
+        \n""") 
+
         print("1) Admin")
         print("2) Login")
         print("3) Register as Customer")
         print("4) Exit")
-        choice = input("Choose : ")
+        choice = input("\n Enter Choose : ")
         if choice == '1' :
             admin_menu(account)    
         elif choice == '2' :
@@ -207,13 +244,21 @@ def main():
             save_account()          # Save account data after registration
             save_login()            # Save login data after registration
         elif choice == '4' :
-            print("Good bye guys have a nice day thankyou and come again")
+            print("""\n 
+            ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+            o                                                         o
+            o  Good bye guys have a nice day thankyou and come again  o
+            o                                                         o
+            ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+            """)
             break                   # Exit the program
         else :
-            print("Invalid Option please try again")
+            print("!!! Invalid Option please try again !!!")
 
             login(users)
+
+     
         
 #---------------Run the program---------------
 
-main()      # ----------Start the program----------
+main()      
