@@ -207,13 +207,12 @@ def main():
             save_account()          # Save account data after registration
             save_login()            # Save login data after registration
         elif choice == '4' :
-            
             print("Good bye guys have a nice day thankyou and come again")
             break                   # Exit the program
         else :
             print("Invalid Option please try again")
 
-    login()
+            login(users)
         
 #---------------Run the program---------------
 
