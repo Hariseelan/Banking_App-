@@ -7,6 +7,8 @@ users = {}
 # Define file paths for account and login data
 account_file = "account.txt"
 login_file = "login.txt"
+
+customer_file = "customers.txt"
       
     
 
@@ -76,8 +78,11 @@ def save_login():
 
 def register_customer():
     username = input('Enter the Username : ').strip()
+
+    #>>>>>  Question 3  <<<<<
+
     if username in users:
-        print("Username already exists.")
+        print("Username already taken, Try another.")
         return                                          # Exit the function if username already exists
 
     password = input('Enter Your Password : ').strip()
@@ -210,7 +215,29 @@ def login(users):
                 \n""")'''
             break
 
+#---------------DISPLAY CUSTOMER LIST---------------
+#>>>>>  Qusetion 1  <<<<<
 
+def display_customer_list():
+
+    while True :
+        with open("customers.txt","w") as customers_file:
+            for acc_no,data in account.items():
+                line = f"{acc_no:^10}:{data['name']:^15}\n"                         # Write each customer's details in a formatted line
+                customers_file.write(line)
+                print(line)
+                return account 
+
+
+        
+#---------------DISPLAY TOTAL USER---------------
+#>>>>>  Question 2  <<<<<<
+
+def display_total_users():
+
+    total = 0 
+    total_users = len(users)
+    print(f"Total Users are : {total_users}")
 
 #---------------Menu---------------
 
@@ -231,7 +258,9 @@ def main():
         print("1) Admin")
         print("2) Login")
         print("3) Register as Customer")
-        print("4) Exit")
+        print("4) Display Customer List")
+        print("5) Display Total Users")
+        print("6) Exit")
         choice = input("\n Enter Choose : ")
         if choice == '1' :
             admin_menu(account)    
@@ -244,6 +273,11 @@ def main():
             save_account()          # Save account data after registration
             save_login()            # Save login data after registration
         elif choice == '4' :
+            display_customer_list()
+        elif choice == '5' :
+            display_total_users()    
+
+        elif choice == '6' :
             print("""\n 
             ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
             o                                                         o
